@@ -573,4 +573,35 @@ window.print=function(){document.querySelectorAll('#pr .doc').forEach(d=>{
   d.querySelectorAll('.sig').forEach(s=>{const k=[...s.children];if(k.length==2&&/Client|Customer/i.test(k[0].textContent))s.prepend(k[1])});
 });_print6()};
 
+</script><style>body{background:#fff!important;animation:none!important}body::before{content:none!important;display:none!important}body::after{content:"";position:fixed;inset:0;background:var(--logo) center/min(420px,60vw) no-repeat;opacity:.06;pointer-events:none;z-index:0}.card{background:#fff!important}</style><script>
+/* ===== v7: Daily frequency, roomy signature boxes, paginated documents that never run under the letterhead ===== */
+STEP.Daily=1;
+const CSS7=`
+.sig{break-inside:avoid;page-break-inside:avoid;margin-top:28px}
+.sig>div{min-height:42mm;display:flex;flex-direction:column;justify-content:flex-end;border-top:1px solid #000!important;padding-top:6px!important;font-size:12.5px}
+.sig img{max-height:34mm}
+h4{break-after:avoid;page-break-after:avoid}
+tr{break-inside:avoid;page-break-inside:avoid}
+table.pg{width:100%;border-collapse:collapse}
+table.pg>thead td,table.pg>tfoot td,table.pg>tbody td{padding:0 16mm;border:0;background:none!important}
+.pg .hsp{height:44mm}
+.pg .fsp{height:28mm}
+@media print{
+ .doc{padding:0!important;margin:0!important;page-break-after:always}
+ .doc.last{page-break-after:auto}
+ table.pg thead{display:table-header-group}
+ table.pg tfoot{display:table-footer-group}
+ .pg tr td:first-child tr{}
+}
+`;
+document.head.insertAdjacentHTML('beforeend','<style>'+CSS7+'</style>');
+const _print7=window.print;
+window.print=function(){document.querySelectorAll('#pr .doc').forEach((d,i,all)=>{
+  if(d.querySelector('table.pg'))return;
+  const inner=d.innerHTML;
+  d.innerHTML=`<table class="pg"><thead><tr><td><div class="hsp"></div></td></tr></thead><tfoot><tr><td><div class="fsp"></div></td></tr></tfoot><tbody><tr><td>${inner}</td></tr></tbody></table>`;
+  if(i==all.length-1)d.classList.add('last');
+});
+return _print7.call(window)};
+
 </script></body></html>
