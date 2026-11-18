@@ -107,7 +107,7 @@ function rsch(id){const v=S.visits.find(x=>x.id==id),d=prompt('New visit date (Y
 /* ---------- documents ---------- */
 const head=t=>`<div class="hd"><div class="hl"><img src="${LOGO}" style="height:74px"><div><b style="font-size:18px">${CO.name}</b><br>${CO.addr}<br>${CO.ph}<br>${CO.mail}<br>${CO.web}</div></div><div style="text-align:right"><h3>${t}</h3></div></div>`;
 const info=(j,no)=>`<table><tr><th>No.</th><td>${no}</td><th>Date</th><td>${j.date}</td></tr><tr><th>Client</th><td>${esc(j.client)}</td><th>Phone</th><td>${esc(j.phone)}</td></tr><tr><th>Site</th><td colspan="3">${esc(j.addr)}, ${esc(j.city)}${j.area?' · '+esc(j.area)+' sq ft':''}</td></tr></table><br>`;
-const money=j=>`<table><tr><th>Service</th><th>Duration</th><th>Visits</th><th>Frequency</th><th>Per visit</th><th>Subtotal</th><th>Tax ${j.tax}%</th><th>Total</th></tr><tr><td>${esc(j.svc)}</td><td>${j.dur} months</td><td>${j.nvis}</td><td>${j.freq}</td><td>${fmt(j.price)}</td><td>${fmt(j.price*j.nvis*(1-(j.disc||0)/100))}</td><td>${fmt(j.price*j.nvis*(1-(j.disc||0)/100)*j.tax/100)}</td><td><b>${fmt(tot(j))}</b></td></tr></table><p>${j.disc?'Discount: '+j.disc+'%. ':''}Amount in words: <b>${words(Math.round(tot(j)))} rupees only</b>${j.notes?'<br>Notes: '+esc(j.notes):''}</p>`;
+const money=j=>`<table><tr><th>Service</th><th>Duration</th><th>Visits</th><th>Frequency</th><th>Per visit</th><th>Subtotal</th><th>Tax ${j.tax}%</th><th>Total</th></tr><tr><td>${esc(j.svc)}</td><td>${j.dur} months</td><td>${j.nvis}</td><td>${j.freq}</td><td>${fmt(j.price)}</td><td>${fmt(j.price*j.nvis*(1-(j.disc||0)/100))}</td><td>${fmt(j.price*j.nvis*(1-(j.disc||0)/100)*j.tax/100)}</td><td><b>${fmt(tot(j))}</b></td></tr></table><p>${j.disc?'Discount: '+j.disc+'%. ':''}Amount in words: <b>${words(Math.round(tot(j)))} rupees only</b></p>`;
 const sig=()=>`<div class="sig"><div>Client signature &amp; date</div><div>For ${CO.name}</div></div>`;
 const D={q:j=>`<div class="doc">${head('QUOTATION')}${info(j,j.qno)}${money(j)}<p>Valid for 15 days from the date above.</p><ol><li>Payment as agreed before service start.</li><li>Client to provide access on scheduled dates.</li><li>Re-service is free within the contract period if pests persist.</li></ol>${sig()}</div>`,
 s:j=>`<div class="doc">${head('SERVICE ORDER')}${info(j,j.sno)}<table><tr><th>Quotation</th><td>${j.qno}</td><th>Contract</th><td>${j.cno}</td></tr><tr><th>Service</th><td>${esc(j.svc)}</td><th>Technicians</th><td>${esc(j.techs)||'To be assigned'}</td></tr></table><h4>Products / chemicals per visit</h4>${tbl(['Product','Quantity','Unit'],j.prods.map(p=>`<tr><td>${esc(p.n)}</td><td>${p.q}</td><td>${p.u}</td></tr>`))}<h4>Visit schedule</h4>${tbl(['#','Date','Status'],S.visits.filter(v=>v.jid==j.id).map((v,i)=>`<tr><td>${i+1}</td><td>${v.date}</td><td>${v.status}</td></tr>`))}<p>Job notes: ______________________________________________</p>${sig()}</div>`,
@@ -584,4 +584,36 @@ h4{break-after:avoid;page-break-after:avoid}
 tr{break-inside:avoid;page-break-inside:avoid}
 `;
 document.head.insertAdjacentHTML('beforeend','<style>'+CSS7+'</style>');
-</script><style>@page{size:A4 portrait;margin:48mm 16mm 32mm 16mm}@media print{.doc{padding:0!important;margin:0!important}#lh{display:block!important}}</style></body></html>
+</script><style>@page{size:A4 portrait;margin:48mm 16mm 32mm 16mm}@media print{.doc{padding:0!important;margin:0!important}#lh{display:block!important}}</style><script>
+/* ===== v8: clean A4 print system (letterhead fixed, content flows between header and footer) ===== */
+[...document.querySelectorAll('style')].forEach(s=>{if(s.textContent.includes('margin:48mm 16mm 32mm 16mm'))s.remove()});
+document.head.insertAdjacentHTML('beforeend',`<style id="print8">
+@page{size:A4 portrait;margin:0}
+@media print{
+ html,body{background:#fff!important;width:210mm;margin:0!important;padding:0!important}
+ body::before,body::after{content:none!important;display:none!important}
+ #lh{display:block!important;position:fixed;top:0;left:0;width:210mm;height:297mm;margin:0;z-index:0}
+ #pr{display:block!important;position:relative;z-index:1;width:210mm}
+ #pr .doc{padding:0!important;margin:0!important;width:210mm;background:none!important;page-break-after:always;break-after:page}
+ #pr .doc:last-child{page-break-after:auto;break-after:auto}
+ #pr table.pg{width:210mm;border-collapse:collapse;table-layout:fixed}
+ #pr table.pg>thead>tr>td,#pr table.pg>tfoot>tr>td,#pr table.pg>tbody>tr>td{padding:0 14mm!important;border:0!important;background:none!important}
+ #pr table.pg>thead{display:table-header-group}#pr table.pg>tfoot{display:table-footer-group}
+ #pr .hsp{height:44mm}#pr .fsp{height:30mm}
+ #pr table table{table-layout:auto}
+ #pr table{background:none!important}
+ #pr tr{break-inside:avoid;page-break-inside:avoid}
+ #pr h3.dt,#pr h4{break-after:avoid;page-break-after:avoid}
+ #pr .sig{break-inside:avoid;page-break-inside:avoid}
+ #pr .sig>div{border-top:0!important;position:relative;padding:0!important}
+ #pr .sig>div::before{content:'';position:absolute;left:0;right:0;bottom:24px;border-top:1px solid #000}
+ #pr .sig>div img{margin-bottom:12px}
+}
+</style>`);
+const _prev8=window.print;
+window.print=function(){document.querySelectorAll('#pr .doc').forEach(d=>{
+  if(d.querySelector(':scope>table.pg'))return;
+  d.innerHTML=`<table class="pg"><thead><tr><td><div class="hsp"></div></td></tr></thead><tfoot><tr><td><div class="fsp"></div></td></tr></tfoot><tbody><tr><td>${d.innerHTML}</td></tr></tbody></table>`});
+return _prev8.call(window)};
+
+</script></body></html>
