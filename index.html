@@ -582,26 +582,6 @@ const CSS7=`
 .sig img{max-height:34mm}
 h4{break-after:avoid;page-break-after:avoid}
 tr{break-inside:avoid;page-break-inside:avoid}
-table.pg{width:100%;border-collapse:collapse}
-table.pg>thead td,table.pg>tfoot td,table.pg>tbody td{padding:0 16mm;border:0;background:none!important}
-.pg .hsp{height:44mm}
-.pg .fsp{height:28mm}
-@media print{
- .doc{padding:0!important;margin:0!important;page-break-after:always}
- .doc.last{page-break-after:auto}
- table.pg thead{display:table-header-group}
- table.pg tfoot{display:table-footer-group}
- .pg tr td:first-child tr{}
-}
 `;
 document.head.insertAdjacentHTML('beforeend','<style>'+CSS7+'</style>');
-const _print7=window.print;
-window.print=function(){document.querySelectorAll('#pr .doc').forEach((d,i,all)=>{
-  if(d.querySelector('table.pg'))return;
-  const inner=d.innerHTML;
-  d.innerHTML=`<table class="pg"><thead><tr><td><div class="hsp"></div></td></tr></thead><tfoot><tr><td><div class="fsp"></div></td></tr></tfoot><tbody><tr><td>${inner}</td></tr></tbody></table>`;
-  if(i==all.length-1)d.classList.add('last');
-});
-return _print7.call(window)};
-
-</script></body></html>
+</script><style>@page{size:A4 portrait;margin:48mm 16mm 32mm 16mm}@media print{.doc{padding:0!important;margin:0!important}#lh{display:block!important}}</style></body></html>
